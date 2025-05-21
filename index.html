@@ -37,7 +37,9 @@
   <link rel="stylesheet" type="text/css" href="style.css"/>
 
 
-  
+
+
+
   <script 
     async 
     src="https://tganalytics.xyz/index.js" 
@@ -87,6 +89,78 @@
       alert("Please open this game inside Telegram!");
     }
   </script>
+
+
+
+
+
+
+  <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+<script>
+  // Firebase 配置（使用你提供的信息）
+  const firebaseConfig = {
+    apiKey: "AIzaSyAeAobRwsOZAnqwMXLxG7tq4vIiy5O85Jo",
+    authDomain: "oceanpoppersleaderboard.firebaseapp.com",
+    projectId: "oceanpoppersleaderboard",
+    storageBucket: "oceanpoppersleaderboard.firebasestorage.app",
+    messagingSenderId: "185863794733",
+    appId: "1:185863794733:web:0a975fc635cc39525088a4",
+    databaseURL: "https://oceanpoppersleaderboard-default-rtdb.firebaseio.com"
+  };
+
+  // 初始化 Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+
+
+  // 提供全局函数供游戏调用
+  window.submitScore = function (playerId, playerInfo, newScore) {
+  const playerRef = db.ref("leaderboard/" + playerId);
+
+  playerRef.once("value").then((snapshot) => {
+    const existingData = snapshot.val();
+    const currentScore = existingData?.score || 0;
+
+    if (newScore > currentScore) {
+      playerRef.set({
+        nickName: playerInfo.nickName || 'Anonymous',
+        avatarUrl: playerInfo.avatarUrl || '',
+        score: newScore,
+        time: Date.now()
+      });
+      console.log("🎉 更新分数成功！");
+    } else {
+      console.log("⬇️ 新分数较低，不更新。");
+    }
+  });
+};
+
+
+  window.loadTopScores = function (callback) {
+  const scoresRef = db.ref("leaderboard");
+
+  scoresRef
+    .orderByChild("score")
+    .limitToLast(10)
+    .once("value", (snapshot) => {
+      const result = [];
+      snapshot.forEach(child => {
+        result.push(child.val());
+      });
+      result.reverse(); // 降序排列
+      callback(result);
+    });
+};
+
+
+
+</script>
+
+
 
 
 </head>
