@@ -38,6 +38,8 @@
 
 
 
+
+
   <script 
     async 
     src="https://tganalytics.xyz/index.js" 
@@ -136,6 +138,7 @@
 
 
   window.loadTopScores = function (callback) {
+  const db = firebase.database();
   const scoresRef = db.ref("leaderboard");
 
   scoresRef
@@ -143,18 +146,31 @@
     .limitToLast(10)
     .once("value", (snapshot) => {
       const result = [];
-      snapshot.forEach(child => {
-        result.push(child.val());
+
+      snapshot.forEach((childSnapshot) => {
+        const entry = childSnapshot.val();
+        const playerId = childSnapshot.key; // ✅ 这是你要的 playerId
+
+        result.push({
+          playerId,       // 添加 playerId 字段
+          playerInfo:{
+    nickName: entry.nickName,
+            avatarUrl: entry.avatarUrl,
+    },
+          score: entry.score,
+          time: entry.time
+        });
       });
-      result.reverse(); // 降序排列
-      callback(result);
+
+      result.reverse(); // Firebase 默认升序 → 降序
+      if (callback) callback(result);
     });
 };
 
 </script>
 
 
-  
+
 
 </head>
 <body>
