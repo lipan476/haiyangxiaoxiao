@@ -37,6 +37,7 @@
   <link rel="stylesheet" type="text/css" href="style.css"/>
 
 
+
   
 
 
@@ -145,7 +146,7 @@
 
   scoresRef
     .orderByChild("score")
-    .limitToLast(10)
+    .limitToLast(100)
     .once("value", (snapshot) => {
       const result = [];
 
@@ -178,6 +179,8 @@
 
 
 
+
+  
 
 </head>
 <body>
